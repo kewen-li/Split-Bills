@@ -1,3 +1,13 @@
+# Bill Splitter
+#### Video Demo:  https://youtu.be/0z9DN6cQ_TA
+#### Description: My project aims to record the transaction that was shared by users and have basic management of each one
+
+## TODO
+1. Calculation on the bills
+2. Display result who should pay whom how much
+3. make a mobile version
+4. add more user friednly functions or UI
+
 # How to use
 
 ## First time
