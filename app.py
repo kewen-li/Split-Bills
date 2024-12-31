@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+from datetime import datetime,timezone
 from sqlalchemy import desc
 
 app = Flask(__name__)
@@ -18,7 +18,7 @@ class Bills(db.Model):
     __tablename__ = 'bills'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(100), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     transactions = db.relationship('Transactions', backref='set', lazy=True)
 
 # Transactions model
@@ -29,16 +29,16 @@ class Transactions(db.Model):
     amount = db.Column(db.Float, nullable=False)
     bill_set_id = db.Column(db.Integer, db.ForeignKey('bills.id'))
     payer_id = db.Column(db.Integer, db.ForeignKey('user.id'))  # Payer
-    splitters = db.relationship('User', secondary='transaction_splitter', backref='transactions')
+    splitters = db.Column(db.String(100))
     payer = db.relationship('User', foreign_keys=[payer_id])
 
-# Association table between Transactions and Splitters (Users)
-class TransactionSplitter(db.Model):
-    __tablename__ = 'transaction_splitter'
-    transaction_id = db.Column(db.Integer, db.ForeignKey('transactions.id'), primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-    # No need for amount_owed in the database since it will be calculated at runtime
-    # amount_owed = db.Column(db.Float, nullable=False)
+# # Association table between Transactions and Splitters (Users)
+# class TransactionSplitter(db.Model):
+#     __tablename__ = 'transaction_splitter'
+#     transaction_id = db.Column(db.Integer, db.ForeignKey('transactions.id'), primary_key=True)
+#     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+#     # No need for amount_owed in the database since it will be calculated at runtime
+#     # amount_owed = db.Column(db.Float, nullable=False)
 
 # Route for the index page (GET request to show the form)
 @app.route('/')
@@ -47,39 +47,37 @@ def index():
     users = User.query.all()  # Get all users (splitters)
     return render_template('index.html', bill_sets=bill_sets, users=users)
 
-# Route to create a new transaction (POST request from the form in index.html)
 @app.route('/add_transaction', methods=['POST'])
 def add_transaction():
     transaction_name = request.form.get('transaction_name')
     transaction_amount = float(request.form.get('transaction_amount'))
     bill_set_id = request.form.get('bill_set')
     payer_id = request.form.get('payer')
-    splitters = request.form.getlist('splitters')
+    splitters = request.form.getlist('splitters')[0]  # This is a list of selected splitter IDs
 
-    # Create a new transaction and add it to the session
+    # Create a new transaction
     new_transaction = Transactions(
         name=transaction_name,
         amount=transaction_amount,
         bill_set_id=bill_set_id,
-        payer_id=payer_id
+        payer_id=payer_id,
+        splitters = splitters
     )
     db.session.add(new_transaction)
     db.session.commit()
 
     # Get the payer user object
     payer = User.query.get(payer_id)
+    if payer is None:
+        # Handle invalid payer (just for safety)
+        return "Payer not found", 400
 
-    # Add payer as the default splitter
-    new_transaction.splitters.append(payer)
-
-    # Add the other splitters to the transaction
-    for splitter_id in splitters:
-        user = User.query.get(splitter_id)
-        new_transaction.splitters.append(user)
+    print(splitters)
 
     db.session.commit()
 
     return redirect(url_for('view_bills'))
+
 
 # Route for viewing bills
 @app.route('/view_bills', methods=['GET'])
@@ -92,7 +90,27 @@ def view_bills():
 def view_transactions(bill_id):
     bill = Bills.query.get_or_404(bill_id)
     transactions = Transactions.query.filter_by(bill_set_id=bill_id).all()
-    return render_template('view_transactions.html', bill=bill, transactions=transactions)
+
+    # Prepare a list of dictionaries for each transaction with splitter names
+    transactions_with_splitters = []
+    for transaction in transactions:
+        # Split the comma-separated list of splitter IDs
+        splitter_ids = transaction.splitters.split(',') if transaction.splitters else []
+        
+        # Fetch the user names based on the IDs
+        splitter_names = []
+        for splitter_id in splitter_ids:
+            user = User.query.get(splitter_id)  # Query User by ID
+            if user:
+                splitter_names.append(user.name)  # Add user name to the list
+
+        # Add the transaction data along with the splitter names
+        transactions_with_splitters.append({
+            'transaction': transaction,
+            'splitter_names': ', '.join(splitter_names)  # Join the names with commas
+        })
+    return render_template('view_transactions.html', bill=bill, transactions_with_splitters=transactions_with_splitters)
+
 
 # Route to delete a bill
 @app.route('/delete_bill/<int:id>', methods=['GET'])
@@ -134,6 +152,14 @@ def create_bill():
 
     # Redirect to the View Bills page
     return redirect(url_for('view_bills'))
+
+# Delete splitter
+@app.route('/delete_splitter/<int:id>', methods=['GET'])
+def delete_splitter(id):
+    user = User.query.get(id)
+    db.session.delete(user)
+    db.session.commit()
+    return redirect(url_for('splitters'))
 
 # Start the application
 if __name__ == '__main__':

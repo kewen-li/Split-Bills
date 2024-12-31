@@ -37,18 +37,20 @@
                     </select>
                 </div>
 
-                <!-- Splitters Selection -->
+                <!-- Splitters Selection (Toggle Buttons) -->
                 <div class="mb-3">
-                    <label for="splitters" class="form-label">Select Splitters</label>
-                    <div class="btn-group-vertical w-100" role="group">
+                    <label class="form-label">Select Splitters</label><br>
+                    <div id="splitters-buttons">
                         {% for user in users %}
-                            <button type="button" class="btn btn-outline-primary btn-lg mb-2">
-                                <input type="checkbox" name="splitters" value="{{ user.id }}" class="d-none">
+                            <button type="button" class="btn btn-outline-primary btn-lg mb-2" id="splitter_{{ user.id }}" onclick="toggleSelection({{ user.id }})">
                                 {{ user.name }}
                             </button>
                         {% endfor %}
                     </div>
                 </div>
+
+                <!-- Hidden input to store selected splitters -->
+                <input type="hidden" name="splitters" id="selected-splitters" value="">
 
                 <!-- Submit Button -->
                 <button type="submit" class="btn btn-primary w-100">Submit Transaction</button>
@@ -56,4 +58,36 @@
         </div>
     </div>
 </div>
+
+<script>
+    // Keep track of selected splitters
+    let selectedSplitters = [];
+
+    // Toggle button selection (add/remove splitter)
+    function toggleSelection(splitterId) {
+        const index = selectedSplitters.indexOf(splitterId);
+        if (index === -1) {
+            // Add to selected list
+            selectedSplitters.push(splitterId);
+            document.getElementById(`splitter_${splitterId}`).classList.add('btn-primary');
+            document.getElementById(`splitter_${splitterId}`).classList.remove('btn-outline-primary');
+        } else {
+            // Remove from selected list
+            selectedSplitters.splice(index, 1);
+            document.getElementById(`splitter_${splitterId}`).classList.remove('btn-primary');
+            document.getElementById(`splitter_${splitterId}`).classList.add('btn-outline-primary');
+        }
+
+        // Update the hidden input field with selected splitters
+        document.getElementById('selected-splitters').value = selectedSplitters.join(',');
+    }
+
+    // Ensure at least one splitter is selected before submitting
+    document.getElementById("transactionForm").addEventListener("submit", function(e) {
+        if (selectedSplitters.length === 0) {
+            e.preventDefault();  // Prevent form submission if no splitter is selected
+            alert('Please select at least one splitter.');
+        }
+    });
+</script>
 {% endblock %}

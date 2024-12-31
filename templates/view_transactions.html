@@ -9,29 +9,15 @@
             <th scope="col">Amount (USD)</th>
             <th scope="col">Payer</th>
             <th scope="col">Splitters</th>
-            <th scope="col">Amount Owed</th>
         </tr>
     </thead>
     <tbody>
-        {% for transaction in bill.transactions %}
+        {% for data in transactions_with_splitters  %}
         <tr>
-            <td>{{ transaction.name }}</td>
-            <td>{{ "%.2f"|format(transaction.amount) }}</td>
-            <td>{{ transaction.payer.name }}</td>
-            <td>
-                {% for splitter in transaction.splitters %}
-                    {{ splitter.name }}<br>
-                {% endfor %}
-            </td>
-            <td id="amount_owed_{{ transaction.id }}">
-                <!-- We'll calculate this dynamically using JavaScript -->
-                <script>
-                    var totalAmount =  transaction.amount ;
-                    var numSplitters = transaction.splitters|length ;
-                    var amountOwed = (totalAmount / numSplitters).toFixed(2); // Calculate amount per splitter
-                    document.getElementById("amount_owed_{{ transaction.id }}").innerHTML = amountOwed;
-                </script>
-            </td>
+            <td>{{ data.transaction.name }}</td>
+            <td>{{ "%.2f"|format(data.transaction.amount) }}</td>
+            <td>{{ data.transaction.payer.name }}</td>
+            <td>{{ data.splitter_names }}</td>
         </tr>
         {% endfor %}
     </tbody>
