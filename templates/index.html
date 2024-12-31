@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h1 class="mt-4 text-center">Create Transaction</h2>
+
+<!-- Transaction Form -->
+<form method="POST" action="/add_transaction">
+    <div class="mb-3">
+        <label for="bill_set" class="form-label">Select Bill Set</label>
+        <select class="form-control" name="bill_set" id="bill_set" required>
+            {% for set in bill_sets %}
+                <option value="{{ set.id }}">{{ set.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="transaction_name" class="form-label">Transaction Name</label>
+        <input type="text" class="form-control" id="transaction_name" name="transaction_name" required>
+    </div>
+    <div class="mb-3">
+        <label for="transaction_amount" class="form-label">Amount (USD)</label>
+        <input type="number" class="form-control" id="transaction_amount" name="transaction_amount" required>
+    </div>
+    <div class="mb-3">
+        <label for="splitters" class="form-label">Select Splitters</label>
+        <div class="btn-group" role="group" aria-label="Splitters">
+            {% for user in users %}
+                <button type="button" class="btn btn-outline-primary">
+                    <input type="checkbox" name="splitters" value="{{ user.id }}" class="d-none">
+                    {{ user.name }}
+                </button>
+            {% endfor %}
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit Transaction</button>
+</form>
+
+{% endblock %}

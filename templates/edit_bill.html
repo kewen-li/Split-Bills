@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Edit Bill</h1>
+<form method="POST">
+    <div class="mb-3">
+        <label for="name" class="form-label">Bill Name</label>
+        <input type="text" class="form-control" id="name" name="name" value="{{ bill.name }}" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+</form>
+{% endblock %}

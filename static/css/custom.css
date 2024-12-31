@@ -1,0 +1,51 @@
+/* Custom CSS to make the content always center aligned */
+body {
+    background-color: #f8f9fa;
+}
+
+/* Center the entire content wrapper using flexbox */
+.main-content {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Content card with styling */
+.content-wrapper {
+    width: 100%;
+    max-width: 550px;
+    padding: 30px;
+    border-radius: 10px;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+footer {
+    text-align: center;
+    padding: 15px;
+    font-size: 0.9rem;
+}
+
+/* Center text and buttons inside forms and content */
+.text-center {
+    text-align: center !important;
+}
+
+.btn-group button {
+    font-size: 1.1rem;
+    padding: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-group button:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+/* Align form buttons in the center */
+.form-btn-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}

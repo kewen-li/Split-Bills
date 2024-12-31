@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1 class="text-center">View Bills</h1>
+
+<!-- New Bill Form -->
+<form method="POST" action="/create_bill">
+    <div class="mb-3">
+        <label for="bill_name" class="form-label">New Bill Name</label>
+        <input type="text" class="form-control" id="bill_name" name="bill_name" required>
+    </div>
+    <button type="submit" class="btn btn-success">Create New Bill</button>
+</form>
+
+<!-- Displaying the list of Bills -->
+<table class="table mt-4">
+    <thead>
+        <tr>
+            <th scope="col">Bill Name</th>
+            <th scope="col">Created At</th>
+            <th scope="col">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for bill in bill_sets %}
+        <tr>
+            <td>{{ bill.name }}</td>
+            <td>{{ bill.created_at.strftime('%Y-%m-%d') }}</td>
+            <td>
+                <a href="/view_transactions/{{ bill.id }}" class="btn btn-primary">View Transactions</a>
+                <a href="/edit_bill/{{ bill.id }}" class="btn btn-warning">Edit</a>
+                <a href="/delete_bill/{{ bill.id }}" class="btn btn-danger">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
