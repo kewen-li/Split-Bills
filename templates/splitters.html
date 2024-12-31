@@ -1,15 +1,21 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1 class="text-center">Manage Splitters</h1>
+<h2 class="text-center">Manage Splitters</h1>
 <form method="POST" action="/splitters">
-    <div class="mb-3">
+    <div class="mb-3 text-center  align-items-center">
         <label for="name" class="form-label">Name</label>
         <input type="text" class="form-control" id="name" name="name" required>
     </div>
-    <button type="submit" class="btn btn-primary">Add Splitter</button>
+    <div class = "text-center">
+        <button type="submit" class="btn btn-primary align-items-center ">Add Splitter</button>
+    </div>
+    
 </form>
+
+<div class="mb-3"></div>
+
 <h2 class="text-center">Existing Splitters</h2>
-<table class="table">
+<table class="table text-center">
     <thead>
         <tr>
             <th scope="col">Name</th>

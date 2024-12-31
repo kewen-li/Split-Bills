@@ -1,7 +1,7 @@
 # init_db.py
 from app import app, db
 from app import User, Bills, Transactions
-from datetime import datetime
+from datetime import datetime,timezone
 
 # Function to initialize the database
 def init_db():
@@ -23,7 +23,7 @@ def init_db():
 
         # Add an initial Bill (Transaction) and BillSet
         if not Bills.query.first():
-            bills = Bills(name='Default Bill', created_at=datetime.utcnow())
+            bills = Bills(name='Default Bill', created_at= datetime.now(timezone.utc))
             db.session.add(bills)
             db.session.commit()
             print("Initial Bills created.")

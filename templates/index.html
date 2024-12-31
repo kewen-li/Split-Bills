@@ -1,38 +1,59 @@
 {% extends "layout.html" %}
 {% block content %}
+<div class="d-flex justify-content-center align-items-center" >
+    <div class="card shadow-sm p-4" style="width: 100%; max-width: 500px;">
+        <div class="card-body">
+            <h5 class="card-title text-center mb-4">Create a New Transaction</h5>
+            <form method="POST" action="/add_transaction">
+                <!-- Bill Set Selection -->
+                <div class="mb-3">
+                    <label for="bill_set" class="form-label">Select Bill Set</label>
+                    <select class="form-select" name="bill_set" id="bill_set" required>
+                        {% for set in bill_sets %}
+                            <option value="{{ set.id }}">{{ set.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-<h1 class="mt-4 text-center">Create Transaction</h2>
+                <!-- Transaction Name -->
+                <div class="mb-3">
+                    <label for="transaction_name" class="form-label">Transaction Name</label>
+                    <input type="text" class="form-control" id="transaction_name" name="transaction_name" required>
+                </div>
 
-<!-- Transaction Form -->
-<form method="POST" action="/add_transaction">
-    <div class="mb-3">
-        <label for="bill_set" class="form-label">Select Bill Set</label>
-        <select class="form-control" name="bill_set" id="bill_set" required>
-            {% for set in bill_sets %}
-                <option value="{{ set.id }}">{{ set.name }}</option>
-            {% endfor %}
-        </select>
-    </div>
-    <div class="mb-3">
-        <label for="transaction_name" class="form-label">Transaction Name</label>
-        <input type="text" class="form-control" id="transaction_name" name="transaction_name" required>
-    </div>
-    <div class="mb-3">
-        <label for="transaction_amount" class="form-label">Amount (USD)</label>
-        <input type="number" class="form-control" id="transaction_amount" name="transaction_amount" required>
-    </div>
-    <div class="mb-3">
-        <label for="splitters" class="form-label">Select Splitters</label>
-        <div class="btn-group" role="group" aria-label="Splitters">
-            {% for user in users %}
-                <button type="button" class="btn btn-outline-primary">
-                    <input type="checkbox" name="splitters" value="{{ user.id }}" class="d-none">
-                    {{ user.name }}
-                </button>
-            {% endfor %}
+                <!-- Transaction Amount -->
+                <div class="mb-3">
+                    <label for="transaction_amount" class="form-label">Amount (USD)</label>
+                    <input type="number" class="form-control" id="transaction_amount" name="transaction_amount" required>
+                </div>
+
+                <!-- Payer Selection -->
+                <div class="mb-3">
+                    <label for="payer" class="form-label">Select Payer</label>
+                    <select class="form-select" name="payer" id="payer" required>
+                        {% for user in users %}
+                            <option value="{{ user.id }}">{{ user.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Splitters Selection -->
+                <div class="mb-3">
+                    <label for="splitters" class="form-label">Select Splitters</label>
+                    <div class="btn-group-vertical w-100" role="group">
+                        {% for user in users %}
+                            <button type="button" class="btn btn-outline-primary btn-lg mb-2">
+                                <input type="checkbox" name="splitters" value="{{ user.id }}" class="d-none">
+                                {{ user.name }}
+                            </button>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary w-100">Submit Transaction</button>
+            </form>
         </div>
     </div>
-    <button type="submit" class="btn btn-primary">Submit Transaction</button>
-</form>
-
+</div>
 {% endblock %}

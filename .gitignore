@@ -1,2 +1,5 @@
 billsplitenv
 __pycache__
+instance/
+instance/bills.db
+instance/bills.db
